@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equilibro Prep</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background: #f8fafc;
+            color: #222;
+        }
+        main {
+            max-width: 1200px;
+            margin: 2em auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            padding: 2em 2.5em 2.5em 2.5em;
+        }
+        h1, h2 {
+            color: #2563eb;
+            font-weight: 700;
+        }
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1em;
+            margin-bottom: 1.5em;
+            align-items: stretch;
+        }
+        .filter-group label {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.97em;
+            color: #555;
+        }
+        .filter-group select {
+            border: 1px solid #bcd0ee;
+            border-radius: 6px;
+            padding: 0.5em 0.7em;
+            background: #f1f5f9;
+            color: #222;
+            font-size: 1em;
+            min-width: 120px;
+            box-shadow: 0 1px 2px rgba(37,99,235,0.04);
+            margin-top: 0.3em;
+            outline: none;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        .filter-group select:focus {
+            border: 1.5px solid #2563eb;
+            box-shadow: 0 0 0 2px #60a5fa44;
+            background: #e0e7ef;
+        }
+        .filter-group option {
+            padding: 0.3em 0.7em;
+        }
+        .btn {
+            background: linear-gradient(90deg, #2563eb 60%, #60a5fa 100%);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.6em 1.4em;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin: 0.5em 0;
+        }
+        .btn:hover {
+            background: linear-gradient(90deg, #1d4ed8 60%, #38bdf8 100%);
+        }
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+            margin-top: 1em;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+        }
+        th, td {
+            padding: 0.7em 0.6em;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+        th {
+            background: #f1f5f9;
+            color: #2563eb;
+            font-weight: 600;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr.selected, tr:hover {
+            background: #e0f2fe;
+        }
+        #uploadStatus, #processStatus {
+            margin: 1em 0 1.5em 0;
+            font-size: 1.05em;
+            color: #059669;
+        }
+        .custom-multiselect {
+            position: relative;
+            min-width: 160px;
+            margin-top: 0.3em;
+        }
+        .custom-multiselect .select-box {
+            border: 1px solid #bcd0ee;
+            border-radius: 6px;
+            background: #f1f5f9;
+            color: #222;
+            font-size: 1em;
+            padding: 0.5em 0.7em;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(37,99,235,0.04);
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        .custom-multiselect .select-box:focus {
+            border: 1.5px solid #2563eb;
+            box-shadow: 0 0 0 2px #60a5fa44;
+            background: #e0e7ef;
+        }
+        .custom-multiselect .options {
+            display: none;
+            position: absolute;
+            z-index: 10;
+            background: #fff;
+            border: 1px solid #bcd0ee;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 16px rgba(37,99,235,0.08);
+            max-height: 220px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 100%;
+            left: 0;
+            top: 100%;
+        }
+        .custom-multiselect.open .options {
+            display: block;
+        }
+        .custom-multiselect .option {
+            padding: 0.4em 0.7em;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .custom-multiselect .option:hover {
+            background: #e0e7ef;
+        }
+        .custom-multiselect input[type="checkbox"] {
+            margin-right: 0.6em;
+        }
+        .custom-multiselect .placeholder {
+            color: #888;
+        }
+        #pagination { margin: 1.5em 0; text-align: center; }
+        #pagination .btn { min-width: 2.2em; padding: 0.4em 0.7em; margin: 0 0.1em; border-radius: 5px; border: none; background: #e0e7ef; color: #2563eb; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+        #pagination .btn.active, #pagination .btn:disabled { background: #2563eb; color: #fff; cursor: default; }
+        #pagination .btn:disabled { opacity: 0.6; }
+        #pagination span { font-size: 1.08em; color: #2563eb; }
+        @media (max-width: 700px) {
+            main { padding: 1em; }
+            .filter-group { flex-direction: column; gap: 0.5em; }
+            table, thead, tbody, th, td, tr { font-size: 0.95em; }
+            .custom-multiselect { min-width: 80px; font-size: 0.95em; }
+        }
+        .dropdown-search {
+            width: 95%;
+            margin: 0.3em 0.2em 0.5em 0.2em;
+            padding: 0.3em;
+            border-radius: 4px;
+            border: 1px solid #bcd0ee;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Equilibro - Selezione scuole</h1>
+        <p>Utilizza questo sito per creare i file csv necessari a popolare con i dati del tuo territorio l'app del mercatino!</p>
+        <p style="display: none;">Scarica dal <a href="https://dati.istruzione.it/opendata/opendata/catalogo/elements1/?area=Adozioni%20libri%20di%20testo">sito del ministero</a> il file per la Regione Lazio e caricalo qui sotto. </p>
+        <form id="uploadForm" style="display:none">
+            <!-- Hidden: file upload not needed anymore -->
+        </form>
+        <div id="uploadStatus">File di input predefinito usato automaticamente.</div>
+        <h2>Scegli le scuole</h2>
+        <p>Seleziona tutte le scuole che ti interessano. Aiutati con i filtri.</p>
+        <p>La tabella indica le sedi dei vari istituti, quindi in caso non fossi cert3, abbonda nella selezione.</p>
+        <div class="filter-group">
+            <label style="min-width:220px;">
+                Cerca scuola:
+                <input type="text" id="schoolNameSearch" placeholder="Cerca per nome scuola..." style="margin-top:0.3em; padding:0.5em; border-radius:6px; border:1px solid #bcd0ee; background:#f1f5f9; font-size:1em;">
+            </label>
+            <label>Comune:
+                <div class="custom-multiselect" id="comuneDropdown"></div>
+            </label>    
+            <label>Provincia:
+                <div class="custom-multiselect" id="provinciaDropdown"></div>
+            </label>
+            <label>Tipologia:
+                <div class="custom-multiselect" id="tipologiaDropdown"></div>
+            </label>
+            <button id="filterBtn" class="btn" style="align-self:flex-start; margin-left:1.5em;">Filtra</button>
+        </div>
+        <table id="schoolsTable">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAllCheckbox"></th>
+                    <th>Nome Scuola</th>
+                    <th>Codice Meccanografico</th>
+                    <th>Comune</th>
+                    <th>Provincia</th>
+                    <th>Tipo Scuola</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <div id="pagination" style="margin: 1.5em 0; text-align: center;"></div>
+        <button id="processBtn" class="btn">Genera i file</button>
+        <div id="processStatus"></div>
+    </main>
+    <script>
+        let uploadedFilename = null;
+        let schools = [];
+        let selectedSchools = new Set();
+        let selectedComuni = [], selectedProvince = [], selectedTipologie = [];
+
+        document.getElementById('uploadForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const res = await fetch('/api/upload', { method: 'POST', body: formData });
+            const data = await res.json();
+            uploadedFilename = data.filename;
+            document.getElementById('uploadStatus').innerText = 'Uploaded: ' + uploadedFilename;
+        };
+
+        function createMultiSelectDropdown(containerId, options, selected, placeholder, onChange) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            container.className = 'custom-multiselect';
+            const box = document.createElement('div');
+            box.className = 'select-box';
+            box.tabIndex = 0;
+            box.innerHTML = `<span class="placeholder">${placeholder}</span>`;
+            const optsDiv = document.createElement('div');
+            optsDiv.className = 'options';
+            // Add search input
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Cerca...';
+            searchInput.className = 'dropdown-search';
+            searchInput.style = 'width: 95%; margin: 0.3em 0.2em 0.5em 0.2em; padding: 0.3em; border-radius: 4px; border: 1px solid #bcd0ee;';
+            optsDiv.appendChild(searchInput);
+            // Add a blank option at the top
+            const blankDiv = document.createElement('div');
+            blankDiv.className = 'option';
+            const blankCb = document.createElement('input');
+            blankCb.type = 'checkbox';
+            blankCb.checked = selected.length === 0;
+            blankCb.onclick = function(e) { e.stopPropagation(); };
+            blankCb.onchange = function(e) {
+                if (blankCb.checked) {
+                    selected.length = 0;
+                    updateBoxText();
+                    onChange([]);
+                    optsDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => { if (cb !== blankCb) cb.checked = false; });
+                }
+            };
+            blankDiv.appendChild(blankCb);
+            blankDiv.appendChild(document.createTextNode('Nessuna selezione'));
+            optsDiv.appendChild(blankDiv);
+            // Option rendering function
+            let optionDivs = [];
+            function renderOptions(filter = '') {
+                // Remove old options (except search and blank)
+                optionDivs.forEach(div => div.remove());
+                optionDivs = [];
+                options.filter(opt => opt.toLowerCase().includes(filter.toLowerCase())).forEach(opt => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'option';
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.value = opt;
+                    cb.checked = selected.includes(opt);
+                    cb.onclick = function(e) { e.stopPropagation(); };
+                    cb.onchange = function(e) {
+                        if (cb.checked && !selected.includes(opt)) selected.push(opt);
+                        else if (!cb.checked && selected.includes(opt)) selected.splice(selected.indexOf(opt), 1);
+                        blankCb.checked = selected.length === 0;
+                        updateBoxText();
+                        onChange(selected.slice());
+                    };
+                    optDiv.appendChild(cb);
+                    optDiv.appendChild(document.createTextNode(opt));
+                    optDiv.onclick = function(e) {
+                        e.stopPropagation();
+                        if (cb !== blankCb) {
+                            cb.checked = !cb.checked;
+                            cb.dispatchEvent(new Event('change'));
+                        }
+                    };
+                    optsDiv.appendChild(optDiv);
+                    optionDivs.push(optDiv);
+                });
+            }
+            renderOptions();
+            searchInput.oninput = function() {
+                renderOptions(searchInput.value);
+            };
+            function updateBoxText() {
+                box.innerHTML = selected.length ? selected.join(', ') : `<span class="placeholder">${placeholder}</span>`;
+            }
+            updateBoxText();
+            box.onclick = function(e) {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-multiselect.open').forEach(el => {
+                    if (el !== container) el.classList.remove('open');
+                });
+                container.classList.toggle('open');
+                if (container.classList.contains('open')) {
+                    searchInput.value = '';
+                    renderOptions();
+                    setTimeout(() => searchInput.focus(), 100);
+                }
+            };
+            document.addEventListener('click', function(e) {
+                if (!container.contains(e.target)) container.classList.remove('open');
+            });
+            container.appendChild(box);
+            container.appendChild(optsDiv);
+        }
+
+        function getUniqueValues(arr, key) {
+            return Array.from(new Set(arr.map(item => item[key]).filter(Boolean))).sort();
+        }
+
+        function populateDropdowns() {
+            createMultiSelectDropdown('comuneDropdown', getUniqueValues(schools, 'COMUNE'), selectedComuni, 'Seleziona Comune', v => selectedComuni = v);
+            createMultiSelectDropdown('provinciaDropdown', getUniqueValues(schools, 'PROVINCIA'), selectedProvince, 'Seleziona Provincia', v => selectedProvince = v);
+            createMultiSelectDropdown('tipologiaDropdown', getUniqueValues(schools, 'DESCRIZIONETIPOLOGIAGRADOISTRUZIONESCUOLA'), selectedTipologie, 'Seleziona Tipologia', v => selectedTipologie = v);
+        }
+
+        async function fetchSchools(filters = {}) {
+            const params = new URLSearchParams(filters).toString();
+            const res = await fetch('/api/schools?' + params);
+            schools = await res.json();
+            populateDropdowns();
+            renderSchools();
+        }
+
+        // Pagination variables
+        let currentPage = 1;
+        const rowsPerPage = 25;
+
+        function renderPagination() {
+            const totalRows = schools.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+            if (!paginationDiv) return;
+            paginationDiv.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            // Prev button
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = '⟨';
+            prevBtn.className = 'btn';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderSchools();
+                }
+            };
+            paginationDiv.appendChild(prevBtn);
+
+            // First page
+            const firstBtn = document.createElement('button');
+            firstBtn.textContent = '1';
+            firstBtn.className = 'btn' + (currentPage === 1 ? ' active' : '');
+            firstBtn.onclick = function() {
+                currentPage = 1;
+                renderSchools();
+            };
+            paginationDiv.appendChild(firstBtn);
+
+            // Ellipsis if needed
+            if (currentPage > 3) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.style.margin = '0 0.3em';
+                paginationDiv.appendChild(ellipsis);
+            }
+
+            // Current page (if not first or last)
+            if (currentPage > 1 && currentPage < totalPages) {
+                const curr = document.createElement('button');
+                curr.textContent = currentPage;
+                curr.className = 'btn active';
+                curr.disabled = true;
+                paginationDiv.appendChild(curr);
+            }
+
+            // Ellipsis if needed
+            if (currentPage < totalPages - 2) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.style.margin = '0 0.3em';
+                paginationDiv.appendChild(ellipsis);
+            }
+
+            // Last page
+            if (totalPages > 1) {
+                const lastBtn = document.createElement('button');
+                lastBtn.textContent = totalPages;
+                lastBtn.className = 'btn' + (currentPage === totalPages ? ' active' : '');
+                lastBtn.onclick = function() {
+                    currentPage = totalPages;
+                    renderSchools();
+                };
+                paginationDiv.appendChild(lastBtn);
+            }
+
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = '⟩';
+            nextBtn.className = 'btn';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderSchools();
+                }
+            };
+            paginationDiv.appendChild(nextBtn);
+
+            // Page info
+            const info = document.createElement('span');
+            info.style.marginLeft = '1em';
+            info.style.fontWeight = '500';
+            paginationDiv.appendChild(info);
+        }
+
+        let schoolNameFilter = '';
+
+        document.getElementById('schoolNameSearch').oninput = function() {
+            schoolNameFilter = this.value.trim().toLowerCase();
+            renderSchools();
+        };
+
+        function renderSchools() {
+            const tbody = document.querySelector('#schoolsTable tbody');
+            tbody.innerHTML = '';
+            let filteredSchools = schools;
+            if (schoolNameFilter) {
+                filteredSchools = filteredSchools.filter(s => (s.DENOMINAZIONESCUOLA || '').toLowerCase().includes(schoolNameFilter));
+            }
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            filteredSchools.slice(start, end).forEach(school => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="checkbox" value="${school.CODICESCUOLA}" ${selectedSchools.has(school.CODICESCUOLA) ? 'checked' : ''}></td>
+                    <td>${school.DENOMINAZIONESCUOLA || ''}</td>
+                    <td>${school.CODICESCUOLA}</td>
+                    <td>${school.COMUNE}</td>
+                    <td>${school.PROVINCIA}</td>
+                    <td>${school.DESCRIZIONETIPOLOGIAGRADOISTRUZIONESCUOLA}</td>
+                `;
+                tr.querySelector('input').onchange = function() {
+                    if (this.checked) selectedSchools.add(this.value);
+                    else selectedSchools.delete(this.value);
+                };
+                tbody.appendChild(tr);
+            });
+            renderPagination(filteredSchools.length);
+        }
+
+        function renderPagination(totalRowsOverride) {
+            const totalRows = typeof totalRowsOverride === 'number' ? totalRowsOverride : schools.length;
+            const totalPages = Math.ceil(totalRows / rowsPerPage);
+            const paginationDiv = document.getElementById('pagination');
+            if (!paginationDiv) return;
+            paginationDiv.innerHTML = '';
+            if (totalPages <= 1) return;
+
+            // Prev button
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = '⟨';
+            prevBtn.className = 'btn';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = function() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderSchools();
+                }
+            };
+            paginationDiv.appendChild(prevBtn);
+
+            // First page
+            const firstBtn = document.createElement('button');
+            firstBtn.textContent = '1';
+            firstBtn.className = 'btn' + (currentPage === 1 ? ' active' : '');
+            firstBtn.onclick = function() {
+                currentPage = 1;
+                renderSchools();
+            };
+            paginationDiv.appendChild(firstBtn);
+
+            // Ellipsis if needed
+            if (currentPage > 3) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.style.margin = '0 0.3em';
+                paginationDiv.appendChild(ellipsis);
+            }
+
+            // Current page (if not first or last)
+            if (currentPage > 1 && currentPage < totalPages) {
+                const curr = document.createElement('button');
+                curr.textContent = currentPage;
+                curr.className = 'btn active';
+                curr.disabled = true;
+                paginationDiv.appendChild(curr);
+            }
+
+            // Ellipsis if needed
+            if (currentPage < totalPages - 2) {
+                const ellipsis = document.createElement('span');
+                ellipsis.textContent = '...';
+                ellipsis.style.margin = '0 0.3em';
+                paginationDiv.appendChild(ellipsis);
+            }
+
+            // Last page
+            if (totalPages > 1) {
+                const lastBtn = document.createElement('button');
+                lastBtn.textContent = totalPages;
+                lastBtn.className = 'btn' + (currentPage === totalPages ? ' active' : '');
+                lastBtn.onclick = function() {
+                    currentPage = totalPages;
+                    renderSchools();
+                };
+                paginationDiv.appendChild(lastBtn);
+            }
+
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = '⟩';
+            nextBtn.className = 'btn';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = function() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderSchools();
+                }
+            };
+            paginationDiv.appendChild(nextBtn);
+
+            // Page info
+            const info = document.createElement('span');
+            info.style.marginLeft = '1em';
+            info.style.fontWeight = '500';
+            paginationDiv.appendChild(info);
+        }
+
+        // Helper to build query params for additive (OR) filtering
+        function buildAdditiveFilterParams() {
+            const params = {};
+            if (selectedComuni.length > 0) params.COMUNE = selectedComuni.join('|');
+            if (selectedProvince.length > 0) params.PROVINCIA = selectedProvince.join('|');
+            if (selectedTipologie.length > 0) params.DESCRIZIONETIPOLOGIAGRADOISTRUZIONESCUOLA = selectedTipologie.join('|');
+            return params;
+        }
+
+        document.getElementById('filterBtn').onclick = function() {
+            fetchSchools(buildAdditiveFilterParams());
+        };
+
+        document.getElementById('processBtn').onclick = async function() {
+            // Remove upload check, always use default input.csv
+            if (selectedSchools.size === 0) {
+                alert('Please select at least one school.');
+                return;
+            }
+            document.getElementById('processStatus').innerText = 'Processing...';
+            const res = await fetch('/api/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ schools: Array.from(selectedSchools) })
+            });
+            const data = await res.json();
+            document.getElementById('processStatus').innerHTML =
+                `Done! <a href="/api/download/${data.output1}">Download CercaListe</a> | <a href="/api/download/${data.output2}">Download ListeLibri</a> | <a href="/api/download/${data.scuoleterritorio}">Download ScuoleTerritorio</a>`;
+        };
+
+        // Update select all checkbox after rendering
+        const origRenderSchools = renderSchools;
+        renderSchools = function() {
+            origRenderSchools();
+            updateSelectAllCheckbox();
+        };
+        
+        // Initial load
+        fetchSchools(buildAdditiveFilterParams());
+    </script>
+</body>
+</html>
